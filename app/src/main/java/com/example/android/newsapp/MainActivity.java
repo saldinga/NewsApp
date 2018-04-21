@@ -3,12 +3,17 @@ package com.example.android.newsapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -22,10 +27,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>> {
 
     private static Context mContext;
-    private String urlString = "http://content.guardianapis.com/search?show-fields=trailText&show-tags=contributor&page-size=150&api-key=test";
+    private String urlString = "http://content.guardianapis.com/search";
     private NewsAdapter mAdapter;
     private ProgressBar progressBar;
-    private ListView listView;
     private TextView infoText;
 
     public static Context getContext() {
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         progressBar = findViewById(R.id.progressBar);
         infoText = findViewById(R.id.info_text);
 
-        listView = findViewById(R.id.list);
+        ListView listView = findViewById(R.id.list);
         listView.setEmptyView(infoText);
 
         mAdapter = new NewsAdapter(this, new ArrayList<News>());
@@ -60,13 +64,77 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
     }
 
+    @Override
+    // This method initialize the contents of the Activity's options menu.
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the Options Menu we specified in XML
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void contentLoader(int id) {
         getSupportLoaderManager().initLoader(id, null, this);
     }
 
     @Override
     public android.support.v4.content.Loader<List<News>> onCreateLoader(int id, Bundle args) {
-        return new NewsLoader(this, urlString);
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String categoryPreference = sharedPrefs.getString(
+                getString(R.string.settings_category_key),
+                getString(R.string.settings_category_default));
+
+        String orderByPreference = sharedPrefs.getString(
+                getString(R.string.settings_sort_key),
+                getString(R.string.settings_sort_default));
+
+        String dateFromPreference = sharedPrefs.getString(
+                getString(R.string.settings_date_key), "");
+
+        String searchPreference = sharedPrefs.getString(
+                getString(R.string.settings_search_key), "");
+
+        // parse breaks apart the URI string that's passed into its parameter
+        Uri baseUri = Uri.parse(urlString);
+
+        // buildUpon prepares the baseUri that we just parsed so we can add query parameters to it
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+// Append query parameter and its value. For example, the `format=geojson`
+        uriBuilder.appendQueryParameter("show-fields", "trailText");
+        uriBuilder.appendQueryParameter("show-tags", "contributor");
+        uriBuilder.appendQueryParameter("page-size", "50");
+
+        if (!categoryPreference.equals(getString(R.string.settings_category_default_value)) &
+                !categoryPreference.equals(getString(R.string.settings_category_default))) {
+            uriBuilder.appendQueryParameter("section", categoryPreference);
+        }
+
+        if (!dateFromPreference.isEmpty()) {
+            uriBuilder.appendQueryParameter("from-date", dateFromPreference);
+        }
+
+        if (!searchPreference.isEmpty()) {
+            uriBuilder.appendQueryParameter("q", searchPreference);
+        }
+
+        uriBuilder.appendQueryParameter("order-by", orderByPreference);
+        uriBuilder.appendQueryParameter("api-key", "test");
+
+        Log.i("URL", uriBuilder.toString());
+
+        return new NewsLoader(this, uriBuilder.toString());
     }
 
     @Override

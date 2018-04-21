@@ -1,6 +1,33 @@
 <resources>
     <string name="app_name">News App</string>
+
     <string name="info_message_no_internet_connection">No internet connection</string>
     <string name="info_message_no_data">No news available</string>
     <string name="website_error">Website error </string>
+
+    <string name="date_pattern">yyyy-MM-dd</string>
+
+    <!-- Strings related to Settings -->
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_title">News Feed Settings</string>
+
+    <!-- Strings related to Category Settings -->
+    <string name="settings_category_key" translatable="false">selected_categories</string>
+    <string name="settings_category_title">News Category</string>
+    <string name="settings_category_default">all</string>
+    <string name="settings_category_default_value">all</string>
+
+    <!-- Strings related to Date Settings -->
+    <string name="settings_date_key" translatable="false">selected_date</string>
+    <string name="settings_date_title">Date: From</string>
+
+    <!-- Strings related to Sort Settings -->
+    <string name="settings_sort_key" translatable="false">sort</string>
+    <string name="settings_sort_title">Order by</string>
+    <string name="settings_sort_default">newest</string>
+
+    <!-- Strings related to Search Settings -->
+    <string name="settings_search_key" translatable="false">search</string>
+    <string name="settings_search_title">Search</string>
+
 </resources>

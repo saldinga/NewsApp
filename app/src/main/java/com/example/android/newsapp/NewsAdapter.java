@@ -56,7 +56,7 @@ public class NewsAdapter extends ArrayAdapter<News> {
         }
 
         TimeZone tz = TimeZone.getDefault();
-        SimpleDateFormat destFormat = new SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault());
+        SimpleDateFormat destFormat = new SimpleDateFormat("yyyy MMM dd, HH:mm", Locale.getDefault());
         destFormat.setTimeZone(tz);
         String result = destFormat.format(parsed);
         dateTextView.setText(result);
